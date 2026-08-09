@@ -24,28 +24,15 @@ const MAIN_NAV: NavItem[] = [
 
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
-    <div
-      style={
-        {
-          "--sidebar": "#eef3ff",
-          "--sidebar-foreground": "#111c2d",
-          "--sidebar-accent": "#dbe7ff",
-          "--sidebar-accent-foreground": "#004ac6",
-          "--sidebar-border": "#c3c6d7",
-          "--sidebar-primary": "#004ac6",
-          "--sidebar-primary-foreground": "#ffffff",
-          "--sidebar-ring": "#004ac6",
-        } as React.CSSProperties
-      }
-    >
+    <div>
       <Sidebar collapsible="icon" {...props}>
         <SidebarHeader>
           <AdminPlatformName />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="border-t border-sidebar-border pt-4">
           <NavGroup items={MAIN_NAV} />
         </SidebarContent>
-        <SidebarFooter>
+        <SidebarFooter className="border-t border-sidebar-border">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Logout">

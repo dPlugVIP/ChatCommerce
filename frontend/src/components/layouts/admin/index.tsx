@@ -6,12 +6,12 @@ import { AdminSidebar } from "./sidebar";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="system-scanlines">
       <AdminSidebar />
       <SidebarInset className="bg-background">
         <AdminHeader />
-        <main className="flex-1 p-4 md:p-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-8">{children}</div>
+        <main className="hud-grid flex-1 p-4 md:p-8">
+          <div className="mx-auto flex max-w-[1500px] flex-col gap-8">{children}</div>
         </main>
       </SidebarInset>
     </SidebarProvider>

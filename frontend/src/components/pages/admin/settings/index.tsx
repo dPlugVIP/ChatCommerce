@@ -9,6 +9,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { businessSettings, products } from "@/lib/mock/chatcommerce";
+import { TelemetryLabel } from "@/components/gui/system";
 
 const colors = ["#004ac6", "#111c2d", "#006c49", "#93000a"];
 
@@ -19,9 +20,10 @@ export default function AdminSettingsPage() {
     <div className="grid gap-8 xl:grid-cols-[1fr_420px]">
       <div className="flex flex-col gap-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-normal md:text-4xl">Business Settings</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Manage your store identity and visual branding for the customer chat interface.
+          <TelemetryLabel>Configuration module</TelemetryLabel>
+          <h1 className="mt-2 font-heading text-3xl font-black uppercase tracking-[-0.04em] md:text-5xl">System configuration</h1>
+          <p className="mt-2 max-w-2xl font-mono text-xs uppercase leading-6 tracking-[0.1em] text-muted-foreground">
+            Manage operator identity and visual signals for the secure customer interface.
           </p>
         </div>
         <Card>
@@ -70,7 +72,7 @@ export default function AdminSettingsPage() {
                     <button
                       key={color}
                       type="button"
-                      className="flex size-11 items-center justify-center rounded-full border"
+                      className="flex size-11 items-center justify-center border"
                       style={{ backgroundColor: color }}
                       aria-label={`Select ${color}`}
                     >
@@ -94,27 +96,27 @@ export default function AdminSettingsPage() {
             <CardTitle>Live Preview</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mx-auto flex h-[560px] max-w-sm flex-col overflow-hidden rounded-3xl border-8 border-muted bg-background shadow-inner">
+            <div className="gui-panel mx-auto flex h-[560px] max-w-sm flex-col overflow-hidden border-4 border-muted bg-background">
               <div className="flex items-center gap-2 border-b bg-card px-4 py-3">
-                <div className="flex size-8 items-center justify-center rounded bg-primary/10 text-primary">
+                <div className="flex size-8 items-center justify-center border border-primary bg-primary/10 text-primary">
                   <StoreIcon />
                 </div>
                 <span className="font-bold">{businessSettings.name}</span>
               </div>
               <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-                <div className="overflow-hidden rounded-xl border bg-card">
+                <div className="overflow-hidden border bg-card">
                   <div className="relative h-32 w-full">
-                    <Image src={previewProduct.images[0].src} alt={previewProduct.images[0].alt} fill sizes="320px" className="object-cover" />
+                    <Image src={previewProduct.images[0].src} alt={previewProduct.images[0].alt} fill sizes="320px" className="image-tech object-cover" />
                   </div>
                   <div className="p-3">
                     <p className="font-semibold">{previewProduct.title}</p>
                     <p className="font-bold text-primary">$349.00</p>
                   </div>
                 </div>
-                <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-primary/15 px-4 py-3 text-sm">
+                <div className="max-w-[85%] border-l-2 border-primary bg-primary/15 px-4 py-3 font-mono text-xs">
                   Do you have these in slate gray?
                 </div>
-                <div className="max-w-[85%] self-end rounded-2xl rounded-br-sm bg-primary px-4 py-3 text-sm text-primary-foreground">
+                <div className="max-w-[85%] self-end border-r-2 border-secondary bg-primary px-4 py-3 font-mono text-xs text-primary-foreground">
                   Yes, we do. I can hold one for you today.
                 </div>
               </div>
@@ -123,8 +125,8 @@ export default function AdminSettingsPage() {
         </Card>
       </aside>
       <div className="fixed inset-x-0 bottom-0 flex justify-end gap-3 border-t bg-background/90 p-4 backdrop-blur md:left-64">
-        <Button variant="outline">Discard</Button>
-        <Button>
+        <Button variant="outline" className="rounded-none font-mono text-xs uppercase">Discard</Button>
+        <Button className="chamfer rounded-none font-mono text-xs uppercase">
           <SaveIcon data-icon="inline-start" />
           Save Changes
         </Button>

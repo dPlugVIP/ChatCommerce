@@ -1,24 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/lib/providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
 const geistSans = Geist({
-  variable: "--font-geist-sans",
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-terminal",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "ChatCommerce",
-  description: "Chat-first commerce storefront for one business per deployment.",
+  title: "DplugVIP // Restricted Commerce Network",
+  description: "Protected access to DplugVIP inventory and secure commerce uplinks.",
 };
 
 export default function RootLayout({
@@ -29,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans")}
     >
       <body className="flex min-h-full flex-col">
         <Providers>{children}</Providers>
