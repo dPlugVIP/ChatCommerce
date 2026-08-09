@@ -1,7 +1,7 @@
 "use client";
 
 import { ArchiveIcon, MoreVerticalIcon, SearchIcon, SendIcon, SlidersHorizontalIcon } from "lucide-react";
-import Image from "next/image";
+import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -17,12 +17,41 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { conversations, formatMoney, getProductById } from "@/lib/mock/chatcommerce";
+import { getConversation, sendAdminMessage } from "@/lib/api/admin";
 import { cn } from "@/lib/utils";
+import type { Conversation } from "@/types";
 
-export default function AdminInboxPage() {
-  const active = conversations[0];
-  const product = active.productId ? getProductById(active.productId) : undefined;
+export default function AdminInboxPage({ conversations }: { conversations: Conversation[] }) {
+  const [items, setItems] = useState(conversations);
+  const [active, setActive] = useState<Conversation | null>(conversations[0] ?? null);
+  const [body, setBody] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  async function select(conversation: Conversation) {
+    setError(null);
+    try {
+      setActive(await getConversation(conversation.id));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unable to load transmission.");
+    }
+  }
+
+  async function send() {
+    if (!active || !body.trim() || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      const updated = await sendAdminMessage(active.id, body.trim());
+      setActive(updated);
+      setItems((current) => current.map((item) => item.id === updated.id ? { ...item, ...updated } : item));
+      setBody("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Transmission failed.");
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <div className="-m-4 grid min-h-[calc(100svh-4rem)] overflow-hidden md:-m-8 lg:grid-cols-[380px_1fr]">
@@ -39,14 +68,15 @@ export default function AdminInboxPage() {
           </div>
         </div>
         <div className="flex flex-col">
-          {conversations.map((conversation) => (
+          {items.map((conversation) => (
             <button
               key={conversation.id}
               className={cn(
                 "flex gap-4 border-l-4 border-transparent p-5 text-left hover:bg-muted/50",
-                conversation.id === active.id && "border-primary bg-primary/10",
+                conversation.id === active?.id && "border-primary bg-primary/10",
               )}
               type="button"
+              onClick={() => void select(conversation)}
             >
               <Avatar className="size-12 rounded-none border border-border">
                 <AvatarImage src={conversation.avatar} />
@@ -63,7 +93,7 @@ export default function AdminInboxPage() {
           ))}
         </div>
       </aside>
-      <section className="hidden min-h-0 flex-col lg:flex">
+      {active ? <section className="hidden min-h-0 flex-col lg:flex">
         <header className="flex h-20 items-center gap-4 border-b px-6">
           <Avatar className="size-12 rounded-none border border-primary">
             <AvatarImage src={active.avatar} />
@@ -92,26 +122,6 @@ export default function AdminInboxPage() {
                 <MessageScrollerItem className="flex justify-center">
                   <div className="border border-border bg-background px-4 py-1 font-mono text-[10px] uppercase text-muted-foreground">Transmission log // Today</div>
                 </MessageScrollerItem>
-                {product ? (
-                  <MessageScrollerItem>
-                    <div className="gui-panel mx-auto flex w-full max-w-xl gap-4 border bg-card p-3">
-                      <span className="relative size-20 shrink-0 overflow-hidden border">
-                        <Image
-                          src={product.images[0].src}
-                          alt={product.images[0].alt}
-                          fill
-                          sizes="80px"
-                          className="image-tech object-cover"
-                        />
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-sm text-muted-foreground">Viewing Product</p>
-                        <p className="truncate font-semibold">{product.title}</p>
-                        <p className="font-bold text-primary">{formatMoney(product.price)}</p>
-                      </div>
-                    </div>
-                  </MessageScrollerItem>
-                ) : null}
                 <MessageGroup>
                   {active.messages.map((message) => {
                     const fromBusiness = message.sender === "business";
@@ -130,6 +140,7 @@ export default function AdminInboxPage() {
                     );
                   })}
                 </MessageGroup>
+                {error ? <MessageScrollerItem className="text-center text-sm text-destructive">{error}</MessageScrollerItem> : null}
               </MessageScrollerContent>
             </MessageScrollerViewport>
             <MessageScrollerButton />
@@ -137,17 +148,28 @@ export default function AdminInboxPage() {
         </MessageScrollerProvider>
         <footer className="border-t bg-[#06131f] p-6">
           <InputGroup className="h-auto rounded-none bg-background font-mono text-xs">
-            <InputGroupTextarea placeholder={`TRANSMIT TO ${active.customerName.toUpperCase()}...`} rows={3} />
+            <InputGroupTextarea
+              placeholder={`TRANSMIT TO ${active.customerName.toUpperCase()}...`}
+              rows={3}
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.ctrlKey && event.key === "Enter") {
+                  event.preventDefault();
+                  void send();
+                }
+              }}
+            />
             <InputGroupAddon align="block-end" className="justify-between border-t">
               <span className="text-xs text-muted-foreground">Press Ctrl + Enter to send</span>
-              <InputGroupButton>
+              <InputGroupButton disabled={sending} onClick={() => void send()}>
                 Send
                 <SendIcon data-icon="inline-end" />
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </footer>
-      </section>
+      </section> : <section className="hidden items-center justify-center font-mono text-sm text-muted-foreground lg:flex">No active transmissions.</section>}
     </div>
   );
 }

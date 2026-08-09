@@ -35,6 +35,17 @@ function isProblem(body: unknown): body is ApiProblem {
   return typeof body === "object" && body !== null && "detail" in body && "status" in body;
 }
 
+function responseProblem(body: unknown, status: number): ApiProblem {
+  if (isProblem(body)) return body;
+  if (typeof body === "object" && body !== null && "detail" in body) {
+    const detail = (body as { detail?: unknown }).detail;
+    if (typeof detail === "string") {
+      return { type: "about:blank", title: "request_error", status, detail };
+    }
+  }
+  return problem("Request failed.", status);
+}
+
 export async function backendRequest<T>(
   path: string,
   init: RequestInit & { token?: string } = {},
@@ -68,7 +79,7 @@ export async function backendRequest<T>(
     return {
       ok: false,
       status: response.status,
-      problem: isProblem(body) ? body : problem("Request failed.", response.status),
+      problem: responseProblem(body, response.status),
     };
   }
 

@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { categories, formatMoney, products } from "@/lib/mock/chatcommerce";
+import { formatMoney } from "@/lib/mock/chatcommerce";
 import { cn } from "@/lib/utils";
+import type { Product } from "@/types";
 
-export default function CatalogPage() {
+export default function CatalogPage({ products, categories }: { products: Product[]; categories: string[] }) {
   const published = products.filter((product) => product.status === "published");
 
   return (
@@ -64,6 +65,7 @@ export default function CatalogPage() {
                   <Image
                     src={product.images[0].src}
                     alt={product.images[0].alt}
+                    unoptimized
                     fill
                     sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                     className="image-tech h-full w-full object-cover transition duration-500 group-hover:scale-105 group-hover:grayscale-0"

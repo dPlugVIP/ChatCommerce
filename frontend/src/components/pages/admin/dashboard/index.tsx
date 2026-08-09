@@ -3,15 +3,14 @@ import { InboxIcon, PackageIcon, RadioIcon } from "lucide-react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { GuiPanel, TelemetryLabel } from "@/components/gui/system";
-import { conversations, products } from "@/lib/mock/chatcommerce";
+import type { Conversation, Product } from "@/types";
 
-const stats = [
-  { label: "Active products", value: products.filter((product) => product.status === "published").length, icon: PackageIcon },
-  { label: "Unread messages", value: conversations.reduce((sum, item) => sum + item.unreadCount, 0), icon: InboxIcon },
-  { label: "Open conversations", value: conversations.filter((item) => item.status === "open").length, icon: RadioIcon },
-];
-
-export default function AdminDashboardPage() {
+export default function AdminDashboardPage({ products, conversations }: { products: Product[]; conversations: Conversation[] }) {
+  const stats = [
+    { label: "Active products", value: products.filter((product) => product.status === "published").length, icon: PackageIcon },
+    { label: "Messages", value: conversations.reduce((sum, item) => sum + item.messages.length, 0), icon: InboxIcon },
+    { label: "Open conversations", value: conversations.filter((item) => item.status === "open").length, icon: RadioIcon },
+  ];
   return (
     <>
       <PageHeader title="Overview" description="Track the storefront and conversations from one admin workspace." />

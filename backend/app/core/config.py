@@ -1,8 +1,8 @@
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 AppEnv = Literal["development", "test", "production"]
 
@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     app_env: AppEnv = "development"
     app_name: str = "ChatCommerce API"
     api_v1_prefix: str = "/api/v1"
-    allowed_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    allowed_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["http://localhost:3000"]
+    )
 
     database_url: str | None = None
     redis_url: str | None = None
@@ -43,7 +45,20 @@ class Settings(BaseSettings):
     @classmethod
     def parse_allowed_origins(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, str):
+            if value.lstrip().startswith("["):
+                import json
+
+                parsed = json.loads(value)
+                if isinstance(parsed, list):
+                    return [str(origin).strip().rstrip("/") for origin in parsed if origin]
             return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
+    @field_validator("database_url", "test_database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: str | None) -> str | None:
+        if value and value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
         return value
 
     @model_validator(mode="after")

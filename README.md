@@ -33,4 +33,9 @@ uv --directory backend run mypy app
 uv --directory backend run pytest
 ```
 
-No Docker setup is planned for this project profile. Use explicit Railway/cloud service configuration for PostgreSQL, Redis, and Cloudinary.
+The backend includes a Dockerfile for Railway and a Compose stack for local
+PostgreSQL, Redis, migrations, seed data, and API development:
+
+```bash
+docker compose -f backend/docker-compose.yml up --build
+```

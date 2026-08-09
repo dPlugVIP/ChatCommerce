@@ -1,5 +1,6 @@
 import AdminInboxPage from "@/components/pages/admin/inbox";
+import { getAdminConversations } from "@/lib/api/server-data";
 
-export default function Page() {
-  return <AdminInboxPage />;
+export default async function Page() {
+  return <AdminInboxPage conversations={await getAdminConversations()} />;
 }

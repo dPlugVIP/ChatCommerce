@@ -17,6 +17,29 @@ async function forward(request: Request, ctx: Ctx, method: string) {
   const { path } = await ctx.params;
   if (path.length === 0 || !ALLOWED_ROOTS.has(path[0])) return notFound();
 
+  if (path[0] === "session") {
+    if (method === "GET") {
+      const result = await adminBackendRequest<{ id: string; name: string; email: string; role: "admin" }>("/auth/session");
+      if (!result.ok) return NextResponse.json(result.problem, { status: result.status });
+      return NextResponse.json({
+        authenticated: true,
+        admin: { ...result.data, role: "admin" },
+      });
+    }
+    if (method === "DELETE") {
+      await adminBackendRequest("/auth/logout", { method: "POST" });
+      const response = new NextResponse(null, { status: 204 });
+      response.cookies.set("chatcommerce_admin", "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 0,
+      });
+      return response;
+    }
+  }
+
   const search = new URL(request.url).search;
   const body = method !== "GET" && method !== "DELETE" ? await request.text() : undefined;
   const result = await adminBackendRequest<unknown>(`/admin/${path.join("/")}${search}`, {

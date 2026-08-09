@@ -1,5 +1,6 @@
 import AdminProductsPage from "@/components/pages/admin/products";
+import { getAdminProducts } from "@/lib/api/server-data";
 
-export default function Page() {
-  return <AdminProductsPage />;
+export default async function Page() {
+  return <AdminProductsPage products={await getAdminProducts()} />;
 }

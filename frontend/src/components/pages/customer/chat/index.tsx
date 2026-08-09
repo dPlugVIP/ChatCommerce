@@ -1,7 +1,7 @@
 "use client";
 
 import { MoreVerticalIcon, PlusCircleIcon, SendIcon } from "lucide-react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
@@ -16,11 +16,35 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { conversations, getProductById } from "@/lib/mock/chatcommerce";
+import { getCurrentConversation, sendCustomerMessage } from "@/lib/api/customer";
+import type { Conversation } from "@/types";
 
 export default function CustomerChatPage() {
-  const conversation = conversations[0];
-  const product = conversation.productId ? getProductById(conversation.productId) : undefined;
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [body, setBody] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    getCurrentConversation()
+      .then(setConversation)
+      .catch((caught) => setError(caught instanceof Error ? caught.message : "Unable to open uplink."));
+  }, []);
+
+  async function send() {
+    const message = body.trim();
+    if (!message || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      setConversation(await sendCustomerMessage(message));
+      setBody("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Transmission failed.");
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <main className="grid flex-1 overflow-hidden md:grid-cols-[320px_1fr]">
@@ -68,32 +92,12 @@ export default function CustomerChatPage() {
                 <MessageScrollerItem className="flex justify-center">
                   <div className="border border-border bg-background px-4 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Transmission log // Today</div>
                 </MessageScrollerItem>
-                {product ? (
-                  <MessageScrollerItem>
-                    <div className="gui-panel mx-auto flex w-full max-w-xl gap-4 border bg-card p-3">
-                      <span className="relative size-20 shrink-0 overflow-hidden border">
-                        <Image
-                          src={product.images[0].src}
-                          alt={product.images[0].alt}
-                          fill
-                          sizes="80px"
-                          className="image-tech object-cover"
-                        />
-                      </span>
-                      <div className="min-w-0">
-                        <p className="font-mono text-[10px] uppercase text-muted-foreground">Attached asset</p>
-                        <p className="truncate font-heading font-semibold uppercase">{product.title}</p>
-                        <p className="font-mono font-bold text-primary">${product.price.toLocaleString()}</p>
-                      </div>
-                    </div>
-                  </MessageScrollerItem>
-                ) : null}
                 <MessageGroup>
-                  {conversation.messages.map((message) => {
+                  {(conversation?.messages ?? []).map((message) => {
                     const fromCustomer = message.sender === "customer";
 
                     return (
-                      <MessageScrollerItem key={message.id} scrollAnchor={message.id === conversation.messages.at(-1)?.id}>
+                      <MessageScrollerItem key={message.id} scrollAnchor={message.id === conversation?.messages.at(-1)?.id}>
                         <Message align={fromCustomer ? "end" : "start"}>
                           <MessageContent>
                             <Bubble align={fromCustomer ? "end" : "start"} variant={fromCustomer ? "tinted" : "default"}>
@@ -106,6 +110,8 @@ export default function CustomerChatPage() {
                     );
                   })}
                 </MessageGroup>
+                {!conversation && !error ? <MessageScrollerItem className="text-center font-mono text-xs text-muted-foreground">Establishing secure uplink...</MessageScrollerItem> : null}
+                {error ? <MessageScrollerItem className="text-center font-mono text-xs text-destructive">{error}</MessageScrollerItem> : null}
               </MessageScrollerContent>
             </MessageScrollerViewport>
             <MessageScrollerButton />
@@ -116,9 +122,19 @@ export default function CustomerChatPage() {
             <InputGroupAddon>
               <PlusCircleIcon />
             </InputGroupAddon>
-            <InputGroupInput placeholder="ENTER TRANSMISSION..." />
+            <InputGroupInput
+              placeholder="ENTER TRANSMISSION..."
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void send();
+                }
+              }}
+            />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton size="icon-sm" className="rounded-none bg-primary text-primary-foreground" aria-label="Send message">
+              <InputGroupButton size="icon-sm" className="rounded-none bg-primary text-primary-foreground" aria-label="Send message" disabled={sending} onClick={() => void send()}>
                 <SendIcon />
               </InputGroupButton>
             </InputGroupAddon>

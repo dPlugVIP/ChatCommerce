@@ -22,12 +22,12 @@ export default function ProductDetailPage({ product }: { product: Product }) {
       <section className="grid gap-8 lg:grid-cols-[1.25fr_0.85fr]">
         <div className="flex flex-col gap-3">
           <GuiPanel className="relative aspect-[4/3] overflow-hidden bg-muted p-0" label="Primary visual scan">
-            <Image src={product.images[0].src} alt={product.images[0].alt} fill priority sizes="(min-width: 1024px) 58vw, 100vw" className="image-tech object-cover" />
+            <Image src={product.images[0].src} alt={product.images[0].alt} fill priority unoptimized sizes="(min-width: 1024px) 58vw, 100vw" className="image-tech object-cover" />
           </GuiPanel>
           <div className="grid grid-cols-3 gap-3">
             {images.slice(0, 3).map((image, index) => (
               <button key={`${image.src}-${index}`} className="relative aspect-square overflow-hidden border bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50" type="button">
-                <Image src={image.src} alt={image.alt} fill sizes="(min-width: 1024px) 20vw, 33vw" className="image-tech object-cover" />
+                <Image src={image.src} alt={image.alt} fill unoptimized sizes="(min-width: 1024px) 20vw, 33vw" className="image-tech object-cover" />
               </button>
             ))}
           </div>

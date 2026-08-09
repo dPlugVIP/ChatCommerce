@@ -7,11 +7,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { PageHeader } from "@/components/shared/page-header";
-import { formatMoney, products } from "@/lib/mock/chatcommerce";
+import { formatMoney } from "@/lib/mock/chatcommerce";
 import { cn } from "@/lib/utils";
 import { GuiPanel } from "@/components/gui/system";
+import type { Product } from "@/types";
 
-export default function AdminProductsPage() {
+export default function AdminProductsPage({ products }: { products: Product[] }) {
   return (
     <>
       <PageHeader
@@ -43,11 +44,11 @@ export default function AdminProductsPage() {
         </div>
       </div>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.slice(5).concat(products.slice(0, 2)).map((product) => (
-          <Link href={`/admin/products/${product.slug}`} key={product.id}>
+        {products.map((product) => (
+          <Link href={`/admin/products/${product.id}`} key={product.id}>
             <GuiPanel className="h-full p-0 transition-colors hover:border-primary" label={`Asset ${product.id}`}>
               <div className="relative aspect-square overflow-hidden bg-muted">
-                <Image src={product.images[0].src} alt={product.images[0].alt} fill sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw" className="image-tech object-cover" />
+                <Image src={product.images[0].src} alt={product.images[0].alt} fill unoptimized sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw" className="image-tech object-cover" />
                 <Badge className="absolute bottom-3 left-3 rounded-none font-mono text-[9px] uppercase" variant={product.status === "published" ? "default" : "secondary"}>
                   {product.status}
                 </Badge>
