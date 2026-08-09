@@ -1,5 +1,34 @@
 import type { Conversation, Product } from "@/types";
 
+export type BackendBusinessSettings = {
+  name: string;
+  support_email: string;
+  primary_color: string;
+  logo_url?: string | null;
+  logo_public_id?: string | null;
+  brand_mark_url?: string | null;
+  brand_mark_public_id?: string | null;
+  favicon_url?: string | null;
+  favicon_public_id?: string | null;
+  updated_at: string;
+};
+
+export function mapBusinessSettings(settings: BackendBusinessSettings) {
+  return {
+    name: settings.name,
+    supportEmail: settings.support_email,
+    replyTime: "Typically replies in 5 minutes",
+    primaryColor: settings.primary_color,
+    logoUrl: settings.logo_url ?? undefined,
+    logoPublicId: settings.logo_public_id ?? undefined,
+    brandMarkUrl: settings.brand_mark_url ?? undefined,
+    brandMarkPublicId: settings.brand_mark_public_id ?? undefined,
+    faviconUrl: settings.favicon_url ?? undefined,
+    faviconPublicId: settings.favicon_public_id ?? undefined,
+    updatedAt: settings.updated_at,
+  };
+}
+
 export type BackendProduct = {
   id: string;
   slug: string;

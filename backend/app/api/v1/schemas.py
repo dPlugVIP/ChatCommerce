@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -79,3 +80,28 @@ class ConversationView(BaseModel):
     last_message: str
     last_message_at: datetime
     messages: list[MessageView] = []
+
+
+class BusinessSettingsInput(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    support_email: EmailStr
+    primary_color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
+    logo_url: str | None = Field(default=None, max_length=2000)
+    logo_public_id: str | None = Field(default=None, max_length=255)
+    brand_mark_url: str | None = Field(default=None, max_length=2000)
+    brand_mark_public_id: str | None = Field(default=None, max_length=255)
+    favicon_url: str | None = Field(default=None, max_length=2000)
+    favicon_public_id: str | None = Field(default=None, max_length=255)
+
+
+class BusinessSettingsView(BusinessSettingsInput):
+    updated_at: datetime
+
+
+class BrandAssetView(BaseModel):
+    kind: Literal["logo", "brand_mark", "favicon"]
+    url: str
+    public_id: str
+    width: int | None = None
+    height: int | None = None
+    format: str | None = None

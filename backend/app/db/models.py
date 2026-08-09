@@ -131,3 +131,21 @@ class Message(Base):
     conversation: Mapped[Conversation] = relationship(back_populates="messages")
     sender: Mapped[User] = relationship()
     product: Mapped[Product | None] = relationship()
+
+
+class BusinessSettings(Base):
+    __tablename__ = "business_settings"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(120), default="DplugVIP")
+    support_email: Mapped[str] = mapped_column(String(320), default="hello@dplugvip.com")
+    primary_color: Mapped[str] = mapped_column(String(7), default="#00e7f2")
+    logo_url: Mapped[str | None] = mapped_column(Text)
+    logo_public_id: Mapped[str | None] = mapped_column(String(255))
+    brand_mark_url: Mapped[str | None] = mapped_column(Text)
+    brand_mark_public_id: Mapped[str | None] = mapped_column(String(255))
+    favicon_url: Mapped[str | None] = mapped_column(Text)
+    favicon_public_id: Mapped[str | None] = mapped_column(String(255))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )

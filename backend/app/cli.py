@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.db.models import Category, Product, User
+from app.db.models import BusinessSettings, Category, Product, User
 from app.db.session import make_session_factory
 
 
@@ -62,6 +62,8 @@ async def seed_admin() -> None:
                     ),
                 ]
             )
+        if not await db.scalar(select(BusinessSettings.id).limit(1)):
+            db.add(BusinessSettings())
         await db.commit()
 
 

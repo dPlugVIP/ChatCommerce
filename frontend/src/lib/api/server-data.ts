@@ -1,12 +1,19 @@
 import "server-only";
 
-import { adminBackendRequest, customerBackendRequest } from "./server-client";
+import { adminBackendRequest, backendRequest, customerBackendRequest } from "./server-client";
 import {
+  mapBusinessSettings,
   mapConversation,
   mapProduct,
+  type BackendBusinessSettings,
   type BackendConversation,
   type BackendProduct,
 } from "./contracts";
+
+export async function getPublicBrandingServer() {
+  const result = await backendRequest<BackendBusinessSettings>("/settings");
+  return result.ok ? mapBusinessSettings(result.data) : null;
+}
 
 export async function getCatalogProducts() {
   const result = await customerBackendRequest<BackendProduct[]>("/products");

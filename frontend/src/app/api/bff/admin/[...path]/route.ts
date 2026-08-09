@@ -40,6 +40,15 @@ async function forward(request: Request, ctx: Ctx, method: string) {
     }
   }
 
+  if (path[0] === "media" && method === "POST") {
+    const result = await adminBackendRequest<unknown>(`/admin/${path.join("/")}`, {
+      method,
+      body: await request.formData(),
+    });
+    if (!result.ok) return NextResponse.json(result.problem, { status: result.status });
+    return NextResponse.json(result.data, { status: result.status });
+  }
+
   const search = new URL(request.url).search;
   const body = method !== "GET" && method !== "DELETE" ? await request.text() : undefined;
   const result = await adminBackendRequest<unknown>(`/admin/${path.join("/")}${search}`, {

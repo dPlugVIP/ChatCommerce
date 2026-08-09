@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/lib/providers";
+import { getPublicBrandingServer } from "@/lib/api/server-data";
 
 const geistSans = Geist({
   variable: "--font-display",
@@ -14,10 +15,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "DplugVIP // Restricted Commerce Network",
-  description: "Protected access to DplugVIP inventory and secure commerce uplinks.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const branding = await getPublicBrandingServer();
+  const name = branding?.name ?? "DplugVIP";
+  const favicon = branding?.faviconUrl ?? branding?.brandMarkUrl;
+  return {
+    title: `${name} // Restricted Commerce Network`,
+    description: `Protected access to ${name} inventory and secure commerce uplinks.`,
+    icons: favicon ? { icon: favicon, shortcut: favicon, apple: favicon } : undefined,
+  };
+}
 
 export default function RootLayout({
   children,

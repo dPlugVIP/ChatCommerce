@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { AdminAuthProvider } from "./auth";
+import { BrandingProvider } from "./branding";
 import { CustomerAuthProvider } from "./customer-auth";
 import { QueryProvider } from "./query-provider";
 
@@ -14,10 +15,12 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryProvider>
       <AdminAuthProvider>
         <CustomerAuthProvider>
-          <TooltipProvider>
-            {children}
-            <Toaster position="top-right" toastOptions={{ classNames: { toast: "font-sans" } }} richColors />
-          </TooltipProvider>
+          <BrandingProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster position="top-right" toastOptions={{ classNames: { toast: "font-sans" } }} richColors />
+            </TooltipProvider>
+          </BrandingProvider>
         </CustomerAuthProvider>
       </AdminAuthProvider>
     </QueryProvider>

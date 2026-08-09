@@ -48,6 +48,13 @@ export interface BusinessSettings {
   supportEmail: string;
   replyTime: string;
   primaryColor: string;
+  logoUrl?: string;
+  logoPublicId?: string;
+  brandMarkUrl?: string;
+  brandMarkPublicId?: string;
+  faviconUrl?: string;
+  faviconPublicId?: string;
+  updatedAt?: string;
 }
 
 export interface AdminIdentity {

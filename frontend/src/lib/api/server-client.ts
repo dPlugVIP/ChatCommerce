@@ -52,7 +52,9 @@ export async function backendRequest<T>(
 ): Promise<BackendResult<T>> {
   const { token, headers, ...rest } = init;
   const finalHeaders = new Headers(headers);
-  if (!finalHeaders.has("content-type") && rest.body) finalHeaders.set("content-type", "application/json");
+  if (!finalHeaders.has("content-type") && rest.body && !(rest.body instanceof FormData)) {
+    finalHeaders.set("content-type", "application/json");
+  }
   finalHeaders.set("accept", "application/json");
   if (token) finalHeaders.set("authorization", `Bearer ${token}`);
 
