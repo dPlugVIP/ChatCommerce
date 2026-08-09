@@ -1,3 +1,4 @@
+import json
 from functools import lru_cache
 from typing import Annotated, Literal
 
@@ -45,13 +46,21 @@ class Settings(BaseSettings):
     @classmethod
     def parse_allowed_origins(cls, value: str | list[str]) -> list[str]:
         if isinstance(value, str):
-            if value.lstrip().startswith("["):
-                import json
+            raw = value.strip()
+            if raw.startswith("[") and raw.endswith("]"):
+                try:
+                    parsed = json.loads(raw)
+                except json.JSONDecodeError:
+                    raw = raw[1:-1]
+                else:
+                    if isinstance(parsed, list):
+                        return [str(origin).strip().rstrip("/") for origin in parsed if origin]
 
-                parsed = json.loads(value)
-                if isinstance(parsed, list):
-                    return [str(origin).strip().rstrip("/") for origin in parsed if origin]
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
+            return [
+                origin.strip().strip("'\"").rstrip("/")
+                for origin in raw.split(",")
+                if origin.strip().strip("'\"")
+            ]
         return value
 
     @field_validator("database_url", "test_database_url", mode="before")
