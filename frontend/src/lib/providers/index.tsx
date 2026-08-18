@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminAuthProvider } from "./auth";
 import { BrandingProvider } from "./branding";
 import { CustomerAuthProvider } from "./customer-auth";
+import { PWAProvider } from "./pwa-provider";
 import { QueryProvider } from "./query-provider";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -16,10 +17,12 @@ export function Providers({ children }: { children: ReactNode }) {
       <AdminAuthProvider>
         <CustomerAuthProvider>
           <BrandingProvider>
-            <TooltipProvider>
-              {children}
-              <Toaster position="top-right" toastOptions={{ classNames: { toast: "font-sans" } }} richColors />
-            </TooltipProvider>
+            <PWAProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster position="top-right" toastOptions={{ classNames: { toast: "font-sans" } }} richColors />
+              </TooltipProvider>
+            </PWAProvider>
           </BrandingProvider>
         </CustomerAuthProvider>
       </AdminAuthProvider>
